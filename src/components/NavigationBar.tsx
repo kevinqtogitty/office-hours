@@ -14,14 +14,10 @@ const NavigationBar = () => {
     {
       linkName: 'Dashboard',
       path: '/dashboard'
-    },
-    {
-      linkName: 'Login',
-      path: '/login'
     }
   ];
   return (
-    <div className="navbar bg-primary-content text-black sticky top-0 z-10">
+    <nav className="navbar bg-primary-content text-black sticky top-0 z-10">
       <div className="navbar-start">
         <div className="navbar-start hidden lg:flex ">
           <Link href="/">
@@ -63,14 +59,24 @@ const NavigationBar = () => {
         <ul className="menu menu-horizontal px-1 gap-6">
           {links.map((item) => (
             <Link key={item.linkName} href={item.path}>
-              <li className="rounded-lg btn btn-ghost hover:bg-blue-500 hover:text-blue-50">
+              <li className="rounded-lg btn btn-ghost text-lg hover:bg-slate-300">
                 {item.linkName}
               </li>
             </Link>
           ))}
+          <div>
+            <li className="text-lg mt-[.1rem] cursor-pointer font-semibold self-middle outline-6 outline outline-blue-500 rounded-lg py-2 px-4 bg-blue-500 text-white">
+              SCHEDULE A DEMO
+            </li>
+          </div>
+          <Link key="login" href="/login">
+            <li className="text-lg mt-[.1rem] cursor-pointer font-semibold self-middle outline-6 outline outline-blue-500 rounded-lg py-2 px-4 text-blue-500 hover:text-white hover:bg-blue-500 transition-colors">
+              LOGIN
+            </li>
+          </Link>
         </ul>
       </div>
-    </div>
+    </nav>
   );
 };
 
