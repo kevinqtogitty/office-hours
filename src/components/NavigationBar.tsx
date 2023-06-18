@@ -1,7 +1,26 @@
+'use client';
+
+import { auth } from '@/firebase/firebaseInit';
+import { onAuthStateChanged } from 'firebase/auth';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const NavigationBar = () => {
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
+  // useEffect(() => {
+
+  // }, [auth.currentUser]);
+
+  onAuthStateChanged(auth, () => {
+    if (auth.currentUser) {
+      console.log('User logged in');
+      setUserLoggedIn(true);
+    } else {
+      console.log('User logged out');
+      setUserLoggedIn(false);
+    }
+  });
+
   const links = [
     {
       linkName: 'About',
@@ -16,6 +35,27 @@ const NavigationBar = () => {
       path: '/dashboard'
     }
   ];
+
+  const LoggedIn = () => {
+    return <div className="flex items-center justify-center"> Logged in </div>;
+  };
+  const LoggedOut = () => {
+    return (
+      <>
+        <div>
+          <li className="text-lg mt-[.1rem] cursor-pointer font-semibold self-middle outline-6 outline outline-blue-500 rounded-lg py-2 px-4 bg-blue-500 text-white">
+            SCHEDULE A DEMO
+          </li>
+        </div>
+        <Link key="login" href="/login">
+          <li className="text-lg mt-[.1rem] cursor-pointer font-semibold self-middle outline-6 outline outline-blue-500 rounded-lg py-2 px-4 text-blue-500 hover:text-white hover:bg-blue-500 transition-colors">
+            LOGIN
+          </li>
+        </Link>
+      </>
+    );
+  };
+
   return (
     <nav className="navbar bg-primary-content text-black sticky top-0 z-10">
       <div className="navbar-start">
@@ -55,8 +95,8 @@ const NavigationBar = () => {
           </ul>
         </div>
       </div>
-      <div className="navbar-end hidden lg:flex">
-        <ul className="menu menu-horizontal px-1 gap-6">
+      <div className="navbar-end hidden lg:flex flex-nowrap">
+        <ul className="menu menu-horizontal px-1 gap-6 flex-nowrap">
           {links.map((item) => (
             <Link key={item.linkName} href={item.path}>
               <li className="rounded-lg btn btn-ghost text-lg hover:bg-slate-300">
@@ -64,16 +104,7 @@ const NavigationBar = () => {
               </li>
             </Link>
           ))}
-          <div>
-            <li className="text-lg mt-[.1rem] cursor-pointer font-semibold self-middle outline-6 outline outline-blue-500 rounded-lg py-2 px-4 bg-blue-500 text-white">
-              SCHEDULE A DEMO
-            </li>
-          </div>
-          <Link key="login" href="/login">
-            <li className="text-lg mt-[.1rem] cursor-pointer font-semibold self-middle outline-6 outline outline-blue-500 rounded-lg py-2 px-4 text-blue-500 hover:text-white hover:bg-blue-500 transition-colors">
-              LOGIN
-            </li>
-          </Link>
+          {userLoggedIn ? <LoggedIn /> : <LoggedOut />}
         </ul>
       </div>
     </nav>
