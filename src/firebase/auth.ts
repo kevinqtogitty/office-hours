@@ -4,9 +4,9 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  onAuthStateChanged
+  onAuthStateChanged,
+  signOut
 } from 'firebase/auth';
-import { redirect } from 'next/navigation';
 import { auth } from './firebaseInit';
 import { addNewUserToDb } from './firestore';
 const provider = new GoogleAuthProvider();
@@ -46,16 +46,17 @@ const signInUserWithGoogle = async () => {
   }
 };
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/auth.user
-    const uid = user.uid;
-    // ...
-  } else {
-    // User is signed out
-    // ...
+const logoutUser = async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.log(error);
   }
-});
+};
 
-export { signInUser, createNewUserWithEmailAndPassword, signInUserWithGoogle };
+export {
+  signInUser,
+  createNewUserWithEmailAndPassword,
+  signInUserWithGoogle,
+  logoutUser
+};
