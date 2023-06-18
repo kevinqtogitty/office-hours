@@ -1,7 +1,9 @@
 'use client';
 
 import { signInUser } from '@/firebase/auth';
-import React from 'react';
+import { auth } from '@/firebase/firebaseInit';
+import { useRouter } from 'next/navigation';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 interface Props {
@@ -9,6 +11,8 @@ interface Props {
 }
 
 const SignInForm = ({ signInActive }: Props) => {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -20,8 +24,12 @@ const SignInForm = ({ signInActive }: Props) => {
       password: ''
     }
   });
-  const onSubmit = (data: { email: string; password: string }) => {
-    signInUser(data.email, data.password);
+  const onSubmit = async (data: { email: string; password: string }) => {
+    const user = await signInUser(data.email, data.password);
+
+    if (auth.currentUser) {
+      router.push('/dashboard');
+    }
   };
 
   const sharedUtilClasses =
