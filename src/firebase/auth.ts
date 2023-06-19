@@ -5,15 +5,16 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   onAuthStateChanged,
-  signOut
+  signOut,
+  User
 } from 'firebase/auth';
 import { auth } from './firebaseInit';
 import { addNewUserToDb } from './firestore';
+import { FirebaseError } from 'firebase/app';
 const provider = new GoogleAuthProvider();
 
 const createNewUserWithEmailAndPassword = async (
-  firstName: string,
-  lastName: string,
+  username: string,
   email: string,
   password: string
 ) => {
@@ -24,15 +25,19 @@ const createNewUserWithEmailAndPassword = async (
       password
     );
     // reroute to sign in page
-    await addNewUserToDb(firstName, lastName, email, user.uid);
+    await addNewUserToDb(username, email, user.uid);
   } catch (error) {
     console.log(error);
   }
 };
 
-const signInUser = async (email: string, password: string) => {
+const signInUser = async (
+  email: string,
+  password: string
+): Promise<User | undefined> => {
   try {
     const { user } = await signInWithEmailAndPassword(auth, email, password);
+    return user;
   } catch (error) {
     console.log(error);
   }
