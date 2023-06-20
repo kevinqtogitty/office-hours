@@ -17,7 +17,7 @@ const createNewUserWithEmailAndPassword = async (
   username: string,
   email: string,
   password: string
-) => {
+): Promise<User | undefined> => {
   try {
     const { user } = await createUserWithEmailAndPassword(
       auth,
@@ -26,6 +26,7 @@ const createNewUserWithEmailAndPassword = async (
     );
     // reroute to sign in page
     await addNewUserToDb(username, email, user.uid);
+    return user;
   } catch (error) {
     console.log(error);
   }
@@ -43,9 +44,10 @@ const signInUser = async (
   }
 };
 
-const signInUserWithGoogle = async () => {
+const signInUserWithGoogle = async (): Promise<User | unknown> => {
   try {
     const { user } = await signInWithPopup(auth, provider);
+    return user;
   } catch (error) {
     console.log(error);
   }
