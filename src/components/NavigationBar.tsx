@@ -7,9 +7,6 @@ import React, { useEffect, useState } from 'react';
 
 const NavigationBar = () => {
   const [userLoggedIn, setUserLoggedIn] = useState(false);
-  // useEffect(() => {
-
-  // }, [auth.currentUser]);
 
   onAuthStateChanged(auth, () => {
     if (auth.currentUser) {
