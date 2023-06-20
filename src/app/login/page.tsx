@@ -3,8 +3,8 @@ import SignInForm from '@/components/SignInForm';
 import SignUpForm from '@/components/SignUpForm';
 import { signInUserWithGoogle } from '@/firebase/auth';
 import Image from 'next/image';
+
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 
 const Login = () => {
   const [signUpActive, setSignUpActive] = useState(false);
