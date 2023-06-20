@@ -1,9 +1,10 @@
 'use client';
 
+import React from 'react';
 import { signInUser } from '@/firebase/auth';
 import { auth } from '@/firebase/firebaseInit';
+import { User } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 interface Props {
@@ -16,7 +17,7 @@ const SignInForm = ({ signInActive }: Props) => {
   const {
     register,
     handleSubmit,
-    watch,
+    setError,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -25,10 +26,22 @@ const SignInForm = ({ signInActive }: Props) => {
     }
   });
   const onSubmit = async (data: { email: string; password: string }) => {
-    const user = await signInUser(data.email, data.password);
-
-    if (auth.currentUser) {
-      router.push('/dashboard');
+    try {
+      const user: User | undefined = await signInUser(
+        data.email,
+        data.password
+      );
+      if (auth.currentUser) router.push('/dashboard');
+      if (!user) throw new Error();
+    } catch (error) {
+      setError(
+        'root',
+        {
+          type: '400',
+          message: 'No account found'
+        },
+        { shouldFocus: true }
+      );
     }
   };
 
@@ -47,26 +60,32 @@ const SignInForm = ({ signInActive }: Props) => {
         Email
       </label>
       <input
-        {...register('email', { required: true })}
+        {...register('email', {
+          required: { value: true, message: 'please enter in your email' }
+        })}
         id="email"
         type="email"
         placeholder="name@example.com"
         className={sharedUtilClasses}
       />
-      {errors.email && <span className="text-red-600">Email is required</span>}
+      {errors.email && (
+        <span className="text-red-600">{errors.email.message}</span>
+      )}
       <label hidden htmlFor="password">
         Password
       </label>
       <input
-        {...register('password', { required: true })}
+        {...register('password', {
+          required: { value: true, message: 'please enter in your password' }
+        })}
         id="password"
         type="password"
         className={sharedUtilClasses}
       />
       {errors.password && (
-        <span className="text-red-600">Password is required</span>
+        <span className="text-red-600">{errors.password.message}</span>
       )}
-      {/* <input type="submit" /> */}
+      <span className="text-red-600">{errors.root?.message}</span>
       <button type="submit" className="btn btn-secondary">
         login
       </button>
