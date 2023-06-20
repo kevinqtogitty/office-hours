@@ -1,6 +1,8 @@
 'use client';
 
 import { createNewUserWithEmailAndPassword } from '@/firebase/auth';
+import { auth } from '@/firebase/firebaseInit';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -9,31 +11,36 @@ interface Props {
 }
 
 const SignUpForm = ({ signUpActive }: Props) => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
-    watch,
+    setError,
     formState: { errors }
   } = useForm({
     defaultValues: {
-      name: '',
+      username: '',
       email: '',
       password: ''
     }
   });
-  const onSubmit = (data: {
-    email: string;
+  const onSubmit = async (data: {
+    username: string;
     password: string;
-    name: string;
+    email: string;
   }) => {
-    const usersName = data.name.split(' ');
-    if (usersName.length != 2) throw new Error('Only first and last name!');
-    createNewUserWithEmailAndPassword(
-      usersName[0],
-      usersName[1],
-      data.email,
-      data.password
-    );
+    try {
+      const user = await createNewUserWithEmailAndPassword(
+        data.username,
+        data.email,
+        data.password
+      );
+
+      if (auth.currentUser) router.push('/dashboard');
+      if (!user) throw new Error();
+    } catch (error) {
+      setError('root', { type: '500', message: 'Server Error' });
+    }
   };
 
   const sharedUtilClasses =
@@ -46,41 +53,53 @@ const SignUpForm = ({ signUpActive }: Props) => {
         signUpActive ? 'block' : 'hidden'
       } flex flex-col items-center gap-4`}
     >
-      <label hidden htmlFor="email">
-        Your name
+      <label hidden htmlFor="username">
+        Username
       </label>
       <input
-        {...register('name', { required: true })}
-        id="name"
+        {...register('username', {
+          required: { value: true, message: 'Please enter your name' },
+          minLength: { value: 6, message: 'At least 6 characters' }
+        })}
+        id="username"
         type="text"
-        placeholder="First Last"
+        placeholder="username"
         className={sharedUtilClasses}
       />
-      {errors.email && <span className="text-red-600">Email is required</span>}
+      {errors.username && (
+        <span className="text-red-600">{errors.username.message}</span>
+      )}
       <label hidden htmlFor="email">
         Email
       </label>
       <input
-        {...register('email', { required: true })}
+        {...register('email', {
+          required: { value: true, message: 'a valid email is required' }
+        })}
         id="email"
         type="email"
         placeholder="name@example.com"
         className={sharedUtilClasses}
       />
-      {errors.email && <span className="text-red-600">Email is required</span>}
+      {errors.email && (
+        <span className="text-red-600">{errors.email.message}</span>
+      )}
       <label hidden htmlFor="password">
         Password
       </label>
       <input
-        {...register('password', { required: true })}
+        {...register('password', {
+          required: { value: true, message: 'a password is required' },
+          minLength: { value: 8, message: 'at least 8 characters' }
+        })}
         id="password"
         type="password"
         className={sharedUtilClasses}
       />
       {errors.password && (
-        <span className="text-red-600">Password is required</span>
+        <span className="text-red-600">{errors.password.message}</span>
       )}
-      {/* <input type="submit" /> */}
+      <span className="text-red-600">{errors.root?.message}</span>
       <button type="submit" className="btn btn-secondary">
         Create Account
       </button>
